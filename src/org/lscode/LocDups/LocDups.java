@@ -10,14 +10,17 @@ package org.lscode.LocDups;
 import org.lscode.DupLocator.*;
 
 import java.lang.reflect.Array;
-import java.util.List;
+import java.util.*;
 
-public class LocDups {
+public class LocDups implements Observer {
 
     private final static String[] HASH_LIST = {"MD5", "SHA-256"};
     private final static int BUFFER_SIZE = 1024 * 32;
 
     private DupLocator dupLocator;
+    private DupLocator.Stage currStage = DupLocator.Stage.NONE;
+
+    private Map<DupLocator.Stage, Map<DupLocator.Phase, String>> phaseMsgs;
 
     public static void main(String[] args){
         DupLocator dupLoc;
@@ -41,13 +44,15 @@ public class LocDups {
         app.run();
     }
 
-    public LocDups(DupLocator dupLocator){
+    private LocDups(DupLocator dupLocator){
 
         this.dupLocator = dupLocator;
+        dupLocator.addObserver(this);
+        phaseMsgs = initPhaseMessages();
     }
 
     public void run(){
-        AbstractFileStorage<String> dups = dupLocator.getDups();
+        FileStorageForRepeated<String> dups = dupLocator.getDups();
         FileStorageMap<String, String> namesakes = dupLocator.getNamesakes();
         List<String> dupDirs;
         List<String> failedDirs;
@@ -129,4 +134,55 @@ public class LocDups {
         }
     }
 
+    @Override
+    public void update(Observable o, Object arg) {
+        String fmtMsg;
+        String stgMsg;
+        DupLocator.Stage stage = ((DupLocator)o).stage();
+        DupLocator.Phase phase = ((DupLocator)o).phase();
+        int filesResult = ((DupLocator)o).filesProcessed();
+        stgMsg = phaseMsgs.get(stage).get(phase);
+
+        fmtMsg = String.format(stgMsg, filesResult);
+
+        if ((phase == DupLocator.Phase.INPROGRESS) || (phase == DupLocator.Phase.RESULT)){
+            System.out.print("\r");
+            System.out.print("                                            ");
+            System.out.print("\r");
+            System.out.print(fmtMsg);
+        }
+        else{
+            System.out.println();
+            System.out.println(fmtMsg);
+        }
+    }
+
+    private Map<DupLocator.Stage, Map<DupLocator.Phase, String>> initPhaseMessages(){
+        Map<DupLocator.Stage, Map<DupLocator.Phase, String>> msgs = new HashMap<>();
+        Map<DupLocator.Phase, String> msgMap;
+
+        //DupLocator.Stage.FILES
+        msgMap = new HashMap<>();
+        msgMap.put(DupLocator.Phase.START, "Searching for files");
+        msgMap.put(DupLocator.Phase.INPROGRESS, "%7d files found so far");
+        msgMap.put(DupLocator.Phase.RESULT, "%7d total files found");
+        msgs.put(DupLocator.Stage.FILES, msgMap);
+
+        //DupLocator.Stage.DUPLICATES
+        msgMap = new HashMap<>();
+        msgMap.put(DupLocator.Phase.START, "Searching for duplicates");
+        msgMap.put(DupLocator.Phase.INPROGRESS, "%7d hashes calculated so far");
+        msgMap.put(DupLocator.Phase.RESULT, "%7d total hashes calculated");
+        msgMap.put(DupLocator.Phase.END, "%7d dups found");
+        msgs.put(DupLocator.Stage.DUPLICATES, msgMap);
+
+        //DupLocator.Stage.NAMESAKES
+        msgMap = new HashMap<>();
+        msgMap.put(DupLocator.Phase.START, "Searching for namesakes");
+        msgMap.put(DupLocator.Phase.INPROGRESS, "%7d namesakes found so far");
+        msgMap.put(DupLocator.Phase.RESULT, "%7d total namesakes found");
+        msgs.put(DupLocator.Stage.NAMESAKES, msgMap);
+
+        return msgs;
+    }
 }
