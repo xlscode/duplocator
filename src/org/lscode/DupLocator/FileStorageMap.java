@@ -11,19 +11,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class FileStorageMap<T, U> implements Iterable<AbstractFileStorage<U>>  {
-    private Map<T, AbstractFileStorage<U>> storageMap = new HashMap<>();
+public class FileStorageMap<T, U> implements Iterable<FileStorage<U>>  {
+    private Map<T, FileStorage<U>> storageMap = new HashMap<>();
 
     @Override
-    public Iterator<AbstractFileStorage<U>> iterator() {
+    public Iterator<FileStorage<U>> iterator() {
         return storageMap.values().iterator();
     }
 
-    public void add(T key, AbstractFileStorage<U> fileStorage){
+    public void add(T key, FileStorage<U> fileStorage){
         storageMap.put(key, fileStorage);
     }
 
-    public AbstractFileStorage<U> get(T key){
+    public FileStorage<U> get(T key){
         return storageMap.get(key);
     }
 

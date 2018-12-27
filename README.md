@@ -16,17 +16,17 @@ It is being written to practice java as well as to "scratch own itch".
 * multiple directories to search 
 * filters for directory and file names to be included in (or excluded from) search
 * gui version
-* ~~reporting number of files processed in time (and total files processed)~~
+* ~~reporting number of files processed in time (and total files processed)~~ - done
 
 ##### Programming techniques used
 As this program is a training project, this is a list of elements, patterns and techniques used:
 * inner classes
 * iterators
 * generic classes
-* abstract class (one)
 * dependency injection (no, no containers)
 * observable/observer pattern
 * enum classes
+* ~~abstract class (one)~~ - refactored out 
 
 #### License
 GNU General Public License v3.0

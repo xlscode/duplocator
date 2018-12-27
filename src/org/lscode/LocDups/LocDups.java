@@ -52,42 +52,42 @@ public class LocDups implements Observer {
     }
 
     public void run(){
-        FileStorageForRepeated<String> dups = dupLocator.getDups();
+        FileStorage<String> dups = dupLocator.getDups();
         FileStorageMap<String, String> namesakes = dupLocator.getNamesakes();
         List<String> dupDirs;
         List<String> failedDirs;
         List<String> failedFiles;
 
-        if (dups.size() > 0){
-            System.out.println("\n\nDuplicates:\n");
-            printDups(dups);
-
-            System.out.println("\n\nDirs:\n");
-
-            dupDirs = dupLocator.getDirectoriesSorted();
-            printDirs(dupDirs);
-        }
-
-        if (namesakes.size() > 0){
-            System.out.println("\n\nNamesakes:\n");
-            printNamesakes(namesakes);
-        }
-
-        failedDirs = dupLocator.getFailedDirs();
-        if (failedDirs.size() > 0){
-            System.out.println("\n\nProblems occured reading the following directories:\n");
-            printStringList(failedDirs);
-        }
-
-        failedFiles = dupLocator.getFailedFiles();
-        if (failedFiles.size() > 0){
-            System.out.println("\n\nProblems occured reading the following files:\n");
-            printStringList(failedFiles);
-        }
+//        if (dups.size() > 0){
+//            System.out.println("\n\nDuplicates:\n");
+//            printDups(dups);
+//
+//            System.out.println("\n\nDirs:\n");
+//
+//            dupDirs = dupLocator.getDirectoriesSorted();
+//            printDirs(dupDirs);
+//        }
+//
+//        if (namesakes.size() > 0){
+//            System.out.println("\n\nNamesakes:\n");
+//            printNamesakes(namesakes);
+//        }
+//
+//        failedDirs = dupLocator.getFailedDirs();
+//        if (failedDirs.size() > 0){
+//            System.out.println("\n\nProblems occured reading the following directories:\n");
+//            printStringList(failedDirs);
+//        }
+//
+//        failedFiles = dupLocator.getFailedFiles();
+//        if (failedFiles.size() > 0){
+//            System.out.println("\n\nProblems occured reading the following files:\n");
+//            printStringList(failedFiles);
+//        }
 
     }
 
-    private void printDups(AbstractFileStorage<String> dubs){
+    private void printDups(FileStorage<String> dubs){
         for (FileArray fileArray: dubs){
             for (FileData fd : fileArray){
                 System.out.println(fd.getFullPath());
@@ -103,7 +103,7 @@ public class LocDups implements Observer {
     }
 
     private void printNamesakes(FileStorageMap<String, String> namesakes){
-        for (AbstractFileStorage<String> fs : namesakes){
+        for (FileStorage<String> fs : namesakes){
             Boolean namePrinted = false;
             FileArray assorted = new FileArray();
             for (FileArray fa : fs){
@@ -140,7 +140,7 @@ public class LocDups implements Observer {
         String stgMsg;
         DupLocator.Stage stage = ((DupLocator)o).stage();
         DupLocator.Phase phase = ((DupLocator)o).phase();
-        int filesResult = ((DupLocator)o).filesProcessed();
+        long filesResult = ((DupLocator)o).filesProcessed();
         stgMsg = phaseMsgs.get(stage).get(phase);
 
         fmtMsg = String.format(stgMsg, filesResult);
