@@ -36,10 +36,10 @@ public class LocDups implements Observer {
         }
         catch (Exception e){
             System.err.println("Error occured while initializing the app.");
-            System.err.println("This should never happen.");
+            System.err.println("Actually, this should never happen.");
             System.exit(1);
         }
-        dupLoc = new DupLocator(digestGenerator, args[0]);
+        dupLoc = new DupLocator(digestGenerator, args);
         LocDups app = new LocDups(dupLoc);
         app.run();
     }
@@ -58,32 +58,32 @@ public class LocDups implements Observer {
         List<String> failedDirs;
         List<String> failedFiles;
 
-//        if (dups.size() > 0){
-//            System.out.println("\n\nDuplicates:\n");
-//            printDups(dups);
-//
-//            System.out.println("\n\nDirs:\n");
-//
-//            dupDirs = dupLocator.getDirectoriesSorted();
-//            printDirs(dupDirs);
-//        }
-//
-//        if (namesakes.size() > 0){
-//            System.out.println("\n\nNamesakes:\n");
-//            printNamesakes(namesakes);
-//        }
-//
-//        failedDirs = dupLocator.getFailedDirs();
-//        if (failedDirs.size() > 0){
-//            System.out.println("\n\nProblems occured reading the following directories:\n");
-//            printStringList(failedDirs);
-//        }
-//
-//        failedFiles = dupLocator.getFailedFiles();
-//        if (failedFiles.size() > 0){
-//            System.out.println("\n\nProblems occured reading the following files:\n");
-//            printStringList(failedFiles);
-//        }
+        if (dups.size() > 0){
+            System.out.println("\n\nDuplicates:\n");
+            printDups(dups);
+
+            System.out.println("\n\nDirs:\n");
+
+            dupDirs = dupLocator.getDirectoriesSorted();
+            printDirs(dupDirs);
+        }
+
+        if (namesakes.size() > 0){
+            System.out.println("\n\nNamesakes:\n");
+            printNamesakes(namesakes);
+        }
+
+        failedDirs = dupLocator.getFailedDirs();
+        if (failedDirs.size() > 0){
+            System.out.println("\n\nProblems occured reading the following directories:\n");
+            printStringList(failedDirs);
+        }
+
+        failedFiles = dupLocator.getFailedFiles();
+        if (failedFiles.size() > 0){
+            System.out.println("\n\nProblems occured reading the following files:\n");
+            printStringList(failedFiles);
+        }
 
     }
 

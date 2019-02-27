@@ -13,7 +13,7 @@ It is being written to practice java as well as to "scratch own itch".
 ##### Planed features
 * command line options
 * reporting space on disk wasted due to duplication of files   
-* multiple directories to search 
+* ~~multiple directories to search~~ - done 
 * filters for directory and file names to be included in (or excluded from) search
 * gui version
 * ~~reporting number of files processed in time (and total files processed)~~ - done

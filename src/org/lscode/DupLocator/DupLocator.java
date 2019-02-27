@@ -7,21 +7,26 @@
 
 package org.lscode.DupLocator;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class DupLocator extends Observable implements Observer{
 
     private MultiDigest digestGenerator;
-    private String startPath;
-    private FileArray allFiles;
+    private String[] paths;
+    private FileArray allFiles = new FileArray();
     private FileStorage<String> dups;
     private FileStorageMap<String, String> namesakes;
     private List<String> dirs;
-    private List<String> failedDirs;
-    private long filesProcessed = 0;
+    private List<String> failedDirs = new ArrayList<>();
+    private long filesProcessedTotal = 0;
+    private long filesProcessedByCurrentFinder = 0;
     private Stage stage = Stage.NONE;
     private Phase phase;
     private Boolean processing = false;
+    private int dirsTotal = 0;
+    private int dirNo = 0;
+
 
     public enum Stage {
         NONE, FILES, DUPLICATES, NAMESAKES
@@ -31,15 +36,16 @@ public class DupLocator extends Observable implements Observer{
         START, INPROGRESS, RESULT, END
     }
 
-    public DupLocator(MultiDigest digestGenerator, String startPath){
-        this.startPath = startPath;
+    public DupLocator(MultiDigest digestGenerator, String[] paths){
+        this.paths = paths;
         this.digestGenerator = digestGenerator;
+        dirsTotal = Array.getLength(paths);
     }
 
     public FileStorage<String> getDups(){
         if (dups == null){
-            if (allFiles == null){
-                findFiles();
+            if (allFiles.isEmpty() ){
+                findFilesInAllDirs();
             }
             findDups();
         }
@@ -50,7 +56,7 @@ public class DupLocator extends Observable implements Observer{
         if (namesakes == null){
             if (dups == null){
                 if (allFiles == null){
-                    findFiles();
+                    findFilesInAllDirs();
                 }
                 findDups();
             }
@@ -63,7 +69,7 @@ public class DupLocator extends Observable implements Observer{
         if (dirs == null) {
             if (dups == null){
                 if (allFiles == null){
-                    findFiles();
+                    findFilesInAllDirs();
                 }
                 findDups();
             }
@@ -91,7 +97,7 @@ public class DupLocator extends Observable implements Observer{
     }
 
     public long filesProcessed(){
-        return filesProcessed;
+        return filesProcessedTotal + filesProcessedByCurrentFinder;
     }
 
     public Boolean processing(){
@@ -106,18 +112,29 @@ public class DupLocator extends Observable implements Observer{
         return phase;
     }
 
-    protected void findFiles(){
-        FileFinder finder = new FileFinder(startPath);
-        finder.addObserver(this);
+    protected void findFilesInAllDirs(){
         stage = Stage.FILES;
         phase = Phase.START;
         setChanged();
         notifyObservers();
         phase = Phase.INPROGRESS;
-        finder.find();
-        allFiles = finder.getFiles();
-        failedDirs = finder.getFailedDirs();
+
+        for (String aPath : paths){
+            dirNo++;
+            findFilesInOneDir(aPath);
+        }
+        phase = Phase.RESULT;
+        setChanged();
+        notifyObservers();
         stage = Stage.NONE;
+    }
+
+    protected void findFilesInOneDir(String startPath){
+        FileFinder finder = new FileFinder(startPath);
+        finder.addObserver(this);
+        finder.find();
+        allFiles.addAll(finder.getFiles());
+        failedDirs.addAll(finder.getFailedDirs());
     }
 
     protected void findDups() {
@@ -127,7 +144,7 @@ public class DupLocator extends Observable implements Observer{
         int step = 50;
 
         stage = Stage.DUPLICATES;
-        filesProcessed = 0;
+        filesProcessedTotal = 0;
         phase = Phase.START;
         setChanged();
         notifyObservers();
@@ -144,8 +161,8 @@ public class DupLocator extends Observable implements Observer{
                 if (!fData.hasProblems()) {
                     String fdCombined = fData.getDigests().combined();
                     digested.put(fdCombined, fData);
-                    filesProcessed +=1;
-                    if (filesProcessed % step == 0){
+                    filesProcessedTotal +=1;
+                    if (filesProcessedTotal % step == 0){
                         setChanged();
                         notifyObservers();
                     }
@@ -158,7 +175,7 @@ public class DupLocator extends Observable implements Observer{
         setChanged();
         notifyObservers();
 
-        filesProcessed = dups.filesTotal();
+        filesProcessedTotal = dups.filesTotal();
         phase = Phase.END;
         setChanged();
         notifyObservers();
@@ -170,11 +187,11 @@ public class DupLocator extends Observable implements Observer{
     protected void findNamesakes(){
         namesakes = new FileStorageMap<>();
         FileStorage<String> fAllNames = new FileStorage<>();
-        FileStorage<String> fSameNames = new FileStorage<>();
+        FileStorage<String> fSameNames;
         int step = 20;
 
         stage = Stage.NAMESAKES;
-        filesProcessed = 0;
+        filesProcessedTotal = 0;
         phase = Phase.START;
         setChanged();
         notifyObservers();
@@ -190,8 +207,8 @@ public class DupLocator extends Observable implements Observer{
             String fName = "";
 
             for (FileData fData : nameGroup) {
-                filesProcessed +=1;
-                if (filesProcessed % step == 0){
+                filesProcessedTotal +=1;
+                if (filesProcessedTotal % step == 0){
                     setChanged();
                     notifyObservers();
                 }
@@ -218,9 +235,10 @@ public class DupLocator extends Observable implements Observer{
 
     @Override
     public void update(Observable o, Object arg) {
-        this.filesProcessed = ((FileFinder)o).filesProcessed();
+        this.filesProcessedByCurrentFinder = ((FileFinder)o).filesProcessed();
         if (!((FileFinder)o).processing()){
-            phase = Phase.RESULT;
+            filesProcessedTotal = filesProcessedTotal + filesProcessedByCurrentFinder;
+            filesProcessedByCurrentFinder = 0;
         }
         setChanged();
         notifyObservers();

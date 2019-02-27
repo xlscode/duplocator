@@ -7,6 +7,7 @@
 
 package org.lscode.DupLocator;
 
+import java.io.File;
 import java.util.*;
 
 public class FileArray implements Iterable<FileData>{
@@ -20,6 +21,10 @@ public class FileArray implements Iterable<FileData>{
         for (FileData fileData : anotherFileArray){
             fileArray.add(fileData);
         }
+    }
+
+    public boolean isEmpty(){
+        return fileArray.isEmpty();
     }
 
     public Iterator<FileData> iterator(){

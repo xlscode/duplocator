@@ -18,7 +18,7 @@ public class FileFinder extends Observable {
     private List<String> failedDirs = new ArrayList<>();
     private int filesProcessed = 0;
     private Boolean processing = false;
-    private final int step = 100;
+    private final int step = 50;
 
     public FileFinder(String startPath) {
         this.startDir = new File(startPath);
