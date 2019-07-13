@@ -18,7 +18,7 @@ public class LocDups implements Observer {
     private final static int BUFFER_SIZE = 1024 * 32;
 
     private DupLocator dupLocator;
-    private DupLocator.Stage currStage = DupLocator.Stage.NONE;
+//    private DupLocator.Stage currStage = DupLocator.Stage.NONE;
 
     private Map<DupLocator.Stage, Map<DupLocator.Phase, String>> phaseMsgs;
 
@@ -51,7 +51,7 @@ public class LocDups implements Observer {
         phaseMsgs = initPhaseMessages();
     }
 
-    public void run(){
+    private void run(){
         FileStorage<String> dups = dupLocator.getDups();
         FileStorageMap<String, String> namesakes = dupLocator.getNamesakes();
         List<String> dupDirs;
