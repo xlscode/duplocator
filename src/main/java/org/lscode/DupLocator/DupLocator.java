@@ -8,9 +8,13 @@
 package org.lscode.DupLocator;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-public class DupLocator extends Observable implements Observer{
+public class DupLocator extends Observable implements Observer {
 
     private MultiDigest digestGenerator;
     private String[] paths;
@@ -54,11 +58,8 @@ public class DupLocator extends Observable implements Observer{
 
     public FileStorageMap<String, String> getNamesakes(){
         if (namesakes == null){
-            if (dups == null){
-                if (allFiles == null){
-                    findFilesInAllDirs();
-                }
-                findDups();
+            if (allFiles == null){
+                findFilesInAllDirs();
             }
             findNamesakes();
         }
@@ -179,7 +180,6 @@ public class DupLocator extends Observable implements Observer{
         phase = Phase.END;
         setChanged();
         notifyObservers();
-
 
         stage = Stage.NONE;
     }

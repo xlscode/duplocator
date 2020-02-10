@@ -7,42 +7,28 @@
 
 package org.lscode.DupLocator;
 
-import java.util.*;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Digests {
-    private List<String> algos = new ArrayList<>();
-    private Map<String, String> digests = new HashMap<>();
+    private Map<String, String> digests = new LinkedHashMap<>();
 
     Digests() {
     }
 
-    Digests(String[] algorithms, String initialValue) {
+    Digests(final String[] algorithms, final String initialValue) {
         for (String algo : algorithms) {
             this.put(algo, initialValue);
         }
     }
 
     public void put(String algo, String digestVal) {
-        algos.add(algo);
         digests.put(algo, digestVal);
     }
 
     public String combined() {
-        Boolean first = true;
-        StringBuilder allDigests = new StringBuilder();
-
-        if (algos.size() == 0) return "";
-        if (algos.size() == 1) return digests.get(algos.get(0));
-
-        for (String algo : algos){
-            if (!first) {
-                allDigests.append("&");
-            }
-            else{
-                first = false;
-            }
-            allDigests.append(digests.get(algo));
-        }
-        return allDigests.toString();
+        return digests.values().stream().collect(Collectors.joining());
     }
 }
