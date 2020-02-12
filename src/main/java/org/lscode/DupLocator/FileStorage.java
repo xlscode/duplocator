@@ -1,4 +1,4 @@
-/**
+/*
  *  file:    FileStorage.java
  *  desc:    concrete class for storing FileArray objects segregated according to a chosen criterion
  *  author:  lscode

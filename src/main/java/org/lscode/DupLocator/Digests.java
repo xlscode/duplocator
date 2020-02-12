@@ -1,4 +1,4 @@
-/**
+/*
  *  file:    Digests.java
  *  desc:    class for storing digests (hashes) of a file
  *  author:  lscode
@@ -29,6 +29,7 @@ public class Digests {
     }
 
     public String combined() {
-        return digests.values().stream().collect(Collectors.joining());
+        //return digests.values().stream().collect(Collectors.joining());
+        return String.join("&", digests.values());
     }
 }

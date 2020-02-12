@@ -1,4 +1,4 @@
-/**
+/*
  *  file:    LocDupsXX.java
  *  desc:    the "app" file - calls classes from the DupLocator package
  *  author:  lscode
@@ -7,9 +7,10 @@
 
 package org.lscode.LocDups;
 
-import org.lscode.DupLocator.*;
-import java.lang.reflect.Array;
+import org.lscode.DupLocator.DupLocator;
+import org.lscode.DupLocator.MultiDigest;
 
+import java.lang.reflect.Array;
 public class LocDups {
 
     private final static String[] HASH_LIST = {"MD5", "SHA-256"};

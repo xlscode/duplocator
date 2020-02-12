@@ -1,4 +1,4 @@
-/**
+/*
  *  file:    FileStorageMap.java
  *  desc:    map class for storing FileStorage objects
  *  author:  lscode

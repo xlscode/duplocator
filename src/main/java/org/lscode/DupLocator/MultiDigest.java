@@ -1,4 +1,4 @@
-/**
+/*
  *  file:    MultiDigest.java
  *  desc:    class for calculating multiple digests (hashes) of a file at once
  *  author:  lscode

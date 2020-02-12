@@ -1,4 +1,4 @@
-/**
+/*
  *  file:    FileArray.java
  *  desc:    list of the FileData objects
  *  author:  lscode
@@ -26,9 +26,9 @@ public class FileArray implements Iterable<FileData>{
         }
     }
 
-    public boolean isEmpty(){
-        return fileArray.isEmpty();
-    }
+//    public boolean isEmpty(){          // probably not needed
+//        return fileArray.isEmpty();
+//    }
 
     public Iterator<FileData> iterator(){
         return fileArray.iterator();

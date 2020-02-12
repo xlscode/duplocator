@@ -1,4 +1,4 @@
-/**
+/*
  *  file:    FileFinder.java
  *  desc:    searches for files in a filesystem
  *  author:  ls-code

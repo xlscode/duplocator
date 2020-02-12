@@ -1,4 +1,4 @@
-/**
+/*
  *  file:    FileData.java
  *  desc:    class representing a file
  *  author:  lscode
@@ -95,9 +95,9 @@ public class FileData {
         builder.append("\n");
         builder.append(path);
         builder.append("\n");
-        builder.append(String.valueOf(size));
+        builder.append(size);
         builder.append("\n");
-        builder.append(String.valueOf(mtime));
+        builder.append(mtime);
         builder.append("\n");
 
         return builder.toString();

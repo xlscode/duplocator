@@ -1,4 +1,4 @@
-/**
+/*
  *  file:    DupLocator.java
  *  desc:    the main class of the DupLocator package
  *  author:  ls-code
@@ -7,12 +7,12 @@
 
 package org.lscode.DupLocator;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import org.lscode.DepExec.DependencyExecutor;
 
 public class DupLocator extends Observable implements Observer {
 
@@ -27,9 +27,10 @@ public class DupLocator extends Observable implements Observer {
     private long filesProcessedByCurrentFinder = 0;
     private Stage stage = Stage.NONE;
     private Phase phase;
-    private Boolean processing = false;
-    private int dirsTotal = 0;
-    private int dirNo = 0;
+//    private Boolean processing = false;  // probably not necessary
+//    private int dirsTotal = 0; // probably not necessary
+//    private int dirNo = 0; // probably not necessary
+    private DependencyExecutor<Processes> executor = new DependencyExecutor<>();
 
 
     public enum Stage {
@@ -40,42 +41,29 @@ public class DupLocator extends Observable implements Observer {
         START, INPROGRESS, RESULT, END
     }
 
+    public enum Processes {
+        FIND_DUPS, FIND_NAMESAKES, FIND_DIRS, FIND_ALLFILES
+    }
+
     public DupLocator(MultiDigest digestGenerator, String[] paths){
         this.paths = paths;
         this.digestGenerator = digestGenerator;
-        dirsTotal = Array.getLength(paths);
+//        dirsTotal = Array.getLength(paths);  // probably not necessary
+        setupDependencies();
     }
 
     public FileStorage<String> getDups(){
-        if (dups == null){
-            if (allFiles.isEmpty() ){
-                findFilesInAllDirs();
-            }
-            findDups();
-        }
+        executor.runProcessChain(Processes.FIND_DUPS);
         return dups;
     }
 
     public FileStorageMap<String, String> getNamesakes(){
-        if (namesakes == null){
-            if (allFiles == null){
-                findFilesInAllDirs();
-            }
-            findNamesakes();
-        }
+        executor.runProcessChain(Processes.FIND_NAMESAKES);
         return namesakes;
     }
 
     public List<String> getDirectories(){
-        if (dirs == null) {
-            if (dups == null){
-                if (allFiles == null){
-                    findFilesInAllDirs();
-                }
-                findDups();
-            }
-            findDirs();
-        }
+        executor.runProcessChain(Processes.FIND_DIRS);
         return dirs;
     }
 
@@ -101,9 +89,9 @@ public class DupLocator extends Observable implements Observer {
         return filesProcessedTotal + filesProcessedByCurrentFinder;
     }
 
-    public Boolean processing(){
-        return processing;
-    }
+//    public Boolean processing(){
+//        return processing;
+//    }
 
     public Stage stage(){
         return stage;
@@ -121,7 +109,7 @@ public class DupLocator extends Observable implements Observer {
         phase = Phase.INPROGRESS;
 
         for (String aPath : paths){
-            dirNo++;
+//            dirNo++;  // probably not necessary
             findFilesInOneDir(aPath);
         }
         phase = Phase.RESULT;
@@ -167,7 +155,6 @@ public class DupLocator extends Observable implements Observer {
                         setChanged();
                         notifyObservers();
                     }
-
                 }
             }
         }
@@ -242,5 +229,12 @@ public class DupLocator extends Observable implements Observer {
         }
         setChanged();
         notifyObservers();
+    }
+
+    private void setupDependencies(){
+        executor.addProcess(Processes.FIND_DUPS, this::findDups, Processes.FIND_ALLFILES);
+        executor.addProcess(Processes.FIND_NAMESAKES, this::findNamesakes, Processes.FIND_DUPS);
+        executor.addProcess(Processes.FIND_DIRS, this::findDirs, Processes.FIND_DUPS);
+        executor.addLastProcess(Processes.FIND_ALLFILES, this::findFilesInAllDirs);
     }
 }

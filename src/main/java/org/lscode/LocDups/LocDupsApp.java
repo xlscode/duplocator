@@ -1,4 +1,4 @@
-/**
+/*
  *  file:    LocDupsApp.java
  *  desc:    the "app" file - calls classes from the DupLocator package
  *  author:  lscode
@@ -13,7 +13,6 @@ import org.lscode.DupLocator.FileArray;
 import org.lscode.DupLocator.FileData;
 import org.lscode.DupLocator.FileStorage;
 import org.lscode.DupLocator.FileStorageMap;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -85,7 +84,7 @@ public final class LocDupsApp implements Observer {
 
     private void printNamesakes(FileStorageMap<String, String> namesakes){
         for (FileStorage<String> fs : namesakes){
-            Boolean namePrinted = false;
+            boolean namePrinted = false;
             FileArray assorted = new FileArray();
             for (FileArray fa : fs){
                 if (!namePrinted){
