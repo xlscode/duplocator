@@ -41,6 +41,9 @@ public class FileFinder extends Observable {
     }
 
     private void find(File nextDir){
+
+        // TODO: consider Files::newDirectoryStream - watch out for IOException
+
         String [] subNodes = nextDir.list();
         if (subNodes == null){
             failedDirs.add(nextDir.getAbsolutePath());

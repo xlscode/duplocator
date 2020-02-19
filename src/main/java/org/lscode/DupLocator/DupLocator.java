@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.stream.Collectors;
+
 import org.lscode.DepExec.DependencyExecutor;
 
 public class DupLocator extends Observable implements Observer {
@@ -74,11 +76,16 @@ public class DupLocator extends Observable implements Observer {
     }
 
     public List<String> getFailedFiles(){
-        List<String> failedFiles = new ArrayList<>();
-        for (FileData fData : allFiles){
-            if (fData.hasProblems()) {failedFiles.add(fData.getFullPath());}
-        }
-        return failedFiles;
+//        List<String> failedFiles = new ArrayList<>();
+//        for (FileData fData : allFiles){
+//            if (fData.hasProblems()) {failedFiles.add(fData.getFullPath());}
+//        }
+//        return failedFiles;
+
+        return allFiles.stream()
+                .filter(FileData::hasProblems)
+                .map(FileData::getFullPath)
+                .collect(Collectors.toList());
     }
 
     public List<String> getFailedDirs(){
@@ -102,19 +109,14 @@ public class DupLocator extends Observable implements Observer {
     }
 
     protected void findFilesInAllDirs(){
-        stage = Stage.FILES;
-        phase = Phase.START;
-        setChanged();
-        notifyObservers();
+        broadcastChange(Stage.FILES, Phase.START);
         phase = Phase.INPROGRESS;
 
         for (String aPath : paths){
 //            dirNo++;  // probably not necessary
             findFilesInOneDir(aPath);
         }
-        phase = Phase.RESULT;
-        setChanged();
-        notifyObservers();
+        broadcastChange(Stage.FILES, Phase.RESULT);
         stage = Stage.NONE;
     }
 
@@ -127,20 +129,15 @@ public class DupLocator extends Observable implements Observer {
     }
 
     protected void findDups() {
-        FileStorage<Long> fAllSizes = new FileStorage<>();
+        FileStorage<Long> fAllSizes;
         FileStorage<Long> fSameSize;
         FileStorage<String> digested = new FileStorage<>();
         int step = 50;
 
-        stage = Stage.DUPLICATES;
         filesProcessedTotal = 0;
-        phase = Phase.START;
-        setChanged();
-        notifyObservers();
+        broadcastChange(Stage.DUPLICATES, Phase.START);
 
-        for (FileData aFile : allFiles){
-            fAllSizes.put(aFile.getSize(), aFile);
-        }
+        fAllSizes = groupBySize();
 
         fSameSize = fAllSizes.getRepeated();
         phase = Phase.INPROGRESS;
@@ -152,39 +149,31 @@ public class DupLocator extends Observable implements Observer {
                     digested.put(fdCombined, fData);
                     filesProcessedTotal +=1;
                     if (filesProcessedTotal % step == 0){
-                        setChanged();
-                        notifyObservers();
+                        broadcastChange();
                     }
                 }
             }
         }
         dups = digested.getRepeated();
-        phase = Phase.RESULT;
-        setChanged();
-        notifyObservers();
+        broadcastChange(Stage.DUPLICATES, Phase.RESULT);
 
         filesProcessedTotal = dups.filesTotal();
-        phase = Phase.END;
-        setChanged();
-        notifyObservers();
+        broadcastChange(Stage.DUPLICATES, Phase.END);
 
         stage = Stage.NONE;
     }
 
     protected void findNamesakes(){
         namesakes = new FileStorageMap<>();
-        FileStorage<String> fAllNames = new FileStorage<>();
+        FileStorage<String> fAllNames;
         FileStorage<String> fSameNames;
         int step = 20;
 
-        stage = Stage.NAMESAKES;
         filesProcessedTotal = 0;
-        phase = Phase.START;
-        setChanged();
-        notifyObservers();
-        for (FileData fData : allFiles){
-            fAllNames.put(fData.getName(), fData);
-        }
+        broadcastChange(Stage.NAMESAKES, Phase.START);
+        fAllNames = groupByName();
+        //TODO: put the grouping function into FileArray Class !! (parameter: a Predicate)
+
         fSameNames = fAllNames.getRepeated();
 
         phase = Phase.INPROGRESS;
@@ -196,8 +185,7 @@ public class DupLocator extends Observable implements Observer {
             for (FileData fData : nameGroup) {
                 filesProcessedTotal +=1;
                 if (filesProcessedTotal % step == 0){
-                    setChanged();
-                    notifyObservers();
+                    broadcastChange();
                 }
                 fName = fData.getName();
                 if (fData.hasDigests()) {
@@ -210,9 +198,7 @@ public class DupLocator extends Observable implements Observer {
             }
             namesakes.add(fName, fSameWithSameName);
         }
-        phase = Phase.RESULT;
-        setChanged();
-        notifyObservers();
+        broadcastChange(Stage.NAMESAKES, Phase.RESULT);
         stage = Stage.NONE;
     }
 
@@ -227,6 +213,33 @@ public class DupLocator extends Observable implements Observer {
             filesProcessedTotal = filesProcessedTotal + filesProcessedByCurrentFinder;
             filesProcessedByCurrentFinder = 0;
         }
+        broadcastChange();
+    }
+
+    private FileStorage<Long> groupBySize(){
+        FileStorage<Long> result = new FileStorage<>();
+        for (FileData aFile : allFiles){
+            result.put(aFile.getSize(), aFile);
+        }
+        return result;
+    }
+
+    private FileStorage<String> groupByName(){
+        FileStorage<String> result = new FileStorage<>();
+        for (FileData fData : allFiles){
+            result.put(fData.getName(), fData);
+        }
+        return result;
+    }
+
+    private void broadcastChange(Stage stage, Phase phase){
+        this.stage = stage;
+        this.phase = phase;
+        setChanged();
+        notifyObservers();
+    }
+
+    private void broadcastChange(){
         setChanged();
         notifyObservers();
     }

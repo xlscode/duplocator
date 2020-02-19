@@ -8,10 +8,12 @@
 package org.lscode.DupLocator;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+//import java.util.Set;
+//import java.util.HashSet;
 
 public class FileArray implements Iterable<FileData>{
     private List<FileData> fileArray = new ArrayList<>();
@@ -43,11 +45,17 @@ public class FileArray implements Iterable<FileData>{
     }
 
     public List<String> getDirs() {
-        Set<String> uniqDirs = new HashSet<>();
-        for (FileData fData : fileArray){
-            uniqDirs.add(fData.getPath());
-        }
-        return new ArrayList<>(uniqDirs);
+//        Set<String> uniqDirs = new HashSet<>();
+//        for (FileData fData : fileArray){
+//            uniqDirs.add(fData.getPath());
+//        }
+//        return new ArrayList<>(uniqDirs);
+
+        return fileArray.stream().map(FileData::getPath).distinct().collect(Collectors.toList());
+    }
+
+    public Stream<FileData> stream(){
+        return fileArray.stream();
     }
 
 }

@@ -86,7 +86,6 @@ public class FileStorage<T> implements Iterable<FileArray>{
                 result.putArray(aKey, arr);
             }
         }
-
         return result;
     }
 
