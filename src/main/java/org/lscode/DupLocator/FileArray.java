@@ -58,4 +58,19 @@ public class FileArray implements Iterable<FileData>{
         return fileArray.stream();
     }
 
+    public FileStorage<Long> groupBySize(){
+        FileStorage<Long> groupped = new FileStorage<>();
+        for (FileData fData : fileArray){
+            groupped.put(fData.getSize(), fData);
+        }
+        return groupped;
+    }
+
+    public FileStorage<String> groupByName(){
+        FileStorage<String> groupped = new FileStorage<>();
+        for (FileData fData : fileArray){
+            groupped.put(fData.getName(), fData);
+        }
+        return groupped;
+    }
 }
