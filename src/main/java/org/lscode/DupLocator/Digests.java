@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 public class Digests {
     private Map<String, String> digests = new LinkedHashMap<>();
 
-    Digests() {
+    public Digests() {
     }
 
-    Digests(final String[] algorithms, final String initialValue) {
+    public Digests(final String[] algorithms, final String initialValue) {
         for (String algo : algorithms) {
             this.put(algo, initialValue);
         }

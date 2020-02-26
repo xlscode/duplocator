@@ -10,38 +10,49 @@ package org.lscode.DupLocator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+//import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 //import java.util.Set;
 //import java.util.HashSet;
 
 public class FileArray implements Iterable<FileData>{
-    private List<FileData> fileArray = new ArrayList<>();
+    private List<FileData> fDataArray = new ArrayList<>();
+
+    public FileArray(){}
+
+    public FileArray(List<FileData> fDataList){
+        fDataArray.addAll(fDataList);
+    }
 
     public void add(FileData newFile){
-        fileArray.add(newFile);
+        fDataArray.add(newFile);
     }
 
     public void addAll(FileArray anotherFileArray){
         for (FileData fileData : anotherFileArray){
-            fileArray.add(fileData);
+            fDataArray.add(fileData);
         }
     }
+
+//    public void addAll(List<FileData> fDataList){         // probably not needed
+//        fDataArray.addAll(fDataList);
+//    }
 
 //    public boolean isEmpty(){          // probably not needed
 //        return fileArray.isEmpty();
 //    }
 
     public Iterator<FileData> iterator(){
-        return fileArray.iterator();
+        return fDataArray.iterator();
     }
 
     public int size(){
-        return fileArray.size();
+        return fDataArray.size();
     }
 
     public FileData get(int index){
-        return fileArray.get(index);
+        return fDataArray.get(index);
     }
 
     public List<String> getDirs() {
@@ -51,16 +62,16 @@ public class FileArray implements Iterable<FileData>{
 //        }
 //        return new ArrayList<>(uniqDirs);
 
-        return fileArray.stream().map(FileData::getPath).distinct().collect(Collectors.toList());
+        return fDataArray.stream().map(FileData::getPath).distinct().collect(Collectors.toList());
     }
 
     public Stream<FileData> stream(){
-        return fileArray.stream();
+        return fDataArray.stream();
     }
 
     public FileStorage<Long> groupBySize(){
         FileStorage<Long> groupped = new FileStorage<>();
-        for (FileData fData : fileArray){
+        for (FileData fData : fDataArray){
             groupped.put(fData.getSize(), fData);
         }
         return groupped;
@@ -68,9 +79,24 @@ public class FileArray implements Iterable<FileData>{
 
     public FileStorage<String> groupByName(){
         FileStorage<String> groupped = new FileStorage<>();
-        for (FileData fData : fileArray){
+        for (FileData fData : fDataArray){
             groupped.put(fData.getName(), fData);
         }
         return groupped;
+    }
+
+    public FileArray errorless(){
+        List<FileData> problemless;
+        problemless = fDataArray.stream()
+//                .filter(((Predicate<FileData>)FileData::hasProblems).negate())
+                .filter((FileData::noProblems))
+                .collect(Collectors.toList());
+        return new FileArray(problemless);
+    }
+
+    public void fillInDigests(MultiDigest digestGenerator){
+        for (FileData fData: fDataArray){
+            fData.fillInDigests(digestGenerator);
+        }
     }
 }

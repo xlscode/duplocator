@@ -80,6 +80,7 @@ public class FileStorage<T> implements Iterable<FileArray>{
         FileStorage<T> result = new FileStorage<>();
         FileArray arr;
 
+        //TODO: change to stream
         for (T aKey : fileMap.keySet()){
             arr = fileMap.get(aKey);
             if (arr.size() > 1){

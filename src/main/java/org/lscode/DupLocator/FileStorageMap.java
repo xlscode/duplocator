@@ -14,7 +14,7 @@ import java.util.Map;
 public class FileStorageMap<T, U> implements Iterable<FileStorage<U>>  {
     private Map<T, FileStorage<U>> storageMap = new HashMap<>();
 
-    @Override
+    //@Override
     public Iterator<FileStorage<U>> iterator() {
         return storageMap.values().iterator();
     }

@@ -28,7 +28,7 @@ public class DupLocator extends Observable implements Observer {
     private long filesProcessedTotal = 0;
     private long filesProcessedByCurrentFinder = 0;
     private Stage stage = Stage.NONE;
-    private Phase phase;
+    private Phase phase = Phase.NONE;
 //    private Boolean processing = false;  // probably not necessary
 //    private int dirsTotal = 0; // probably not necessary
 //    private int dirNo = 0; // probably not necessary
@@ -40,7 +40,7 @@ public class DupLocator extends Observable implements Observer {
     }
 
     public enum Phase {
-        START, INPROGRESS, RESULT, END
+        NONE, START, INPROGRESS, RESULT, END
     }
 
     public enum Processes {
@@ -110,7 +110,7 @@ public class DupLocator extends Observable implements Observer {
 
     protected void findFilesInAllDirs(){
         broadcastChange(Stage.FILES, Phase.START);
-        phase = Phase.INPROGRESS;
+        stateChange(Stage.FILES, Phase.INPROGRESS);
 
         for (String aPath : paths){
 //            dirNo++;  // probably not necessary
@@ -134,24 +134,18 @@ public class DupLocator extends Observable implements Observer {
         FileStorage<String> digested = new FileStorage<>();
         int step = 50;
 
-        filesProcessedTotal = 0;
         broadcastChange(Stage.DUPLICATES, Phase.START);
 
         fAllSizes = allFiles.groupBySize();
-
         fSameSize = fAllSizes.getRepeated();
-        phase = Phase.INPROGRESS;
+        stateChange(Stage.DUPLICATES, Phase.INPROGRESS);
         for (FileArray group : fSameSize) {
-            for (FileData fData : group){
-                fData.fillInDigests(digestGenerator);
-                if (!fData.hasProblems()) {
-                    String fdCombined = fData.getDigests().combined();
-                    digested.put(fdCombined, fData);
-                    filesProcessedTotal +=1;
-                    if (filesProcessedTotal % step == 0){
-                        broadcastChange();
-                    }
-                }
+            group.fillInDigests(digestGenerator);
+            FileArray newGroup = group.errorless();
+            for (FileData fData : newGroup){
+                String fdCombined = fData.getDigests().combined();
+                digested.put(fdCombined, fData);
+                broadcastChangeIfStep(step);
             }
         }
         dups = digested.getRepeated();
@@ -159,7 +153,6 @@ public class DupLocator extends Observable implements Observer {
 
         filesProcessedTotal = dups.filesTotal();
         broadcastChange(Stage.DUPLICATES, Phase.END);
-
         resetChange();
     }
 
@@ -169,23 +162,19 @@ public class DupLocator extends Observable implements Observer {
         FileStorage<String> fSameNames;
         int step = 20;
 
-        filesProcessedTotal = 0;
         broadcastChange(Stage.NAMESAKES, Phase.START);
         fAllNames = allFiles.groupByName();
 
         fSameNames = fAllNames.getRepeated();
 
-        phase = Phase.INPROGRESS;
+        broadcastChange(Stage.NAMESAKES, Phase.INPROGRESS);
         for (FileArray nameGroup : fSameNames) {
             FileStorage<String> fSameWithSameName = new FileStorage<>();
             int assortedCnt = 1;
             String fName = "";
 
             for (FileData fData : nameGroup) {
-                filesProcessedTotal +=1;
-                if (filesProcessedTotal % step == 0){
-                    broadcastChange();
-                }
+                broadcastChangeIfStep(step);
                 fName = fData.getName();
                 if (fData.hasDigests()) {
                     fSameWithSameName.put(fData.getDigests().combined(), fData);
@@ -207,7 +196,7 @@ public class DupLocator extends Observable implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        this.filesProcessedByCurrentFinder = ((FileFinder)o).filesProcessed();
+        filesProcessedByCurrentFinder = ((FileFinder)o).filesProcessed();
         if (!((FileFinder)o).processing()){
             filesProcessedTotal = filesProcessedTotal + filesProcessedByCurrentFinder;
             filesProcessedByCurrentFinder = 0;
@@ -227,8 +216,22 @@ public class DupLocator extends Observable implements Observer {
         notifyObservers();
     }
 
-    private void resetChange(){
-        stage = Stage.NONE;
+    private void broadcastChangeIfStep(int step){
+        filesProcessedTotal += 1;
+        if (filesProcessedTotal % step == 0){
+            broadcastChange();
+        }
+        broadcastChange();
+    }
+
+    private void stateChange(Stage stage, Phase phase){
+        this.stage = stage;
+        this.phase = phase;
+    }
+
+    private void resetChange() {
+        stateChange(Stage.NONE, Phase.NONE);
+        filesProcessedTotal = 0;
     }
 
     private void setupDependencies(){

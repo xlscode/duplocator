@@ -75,9 +75,9 @@ public class FileData {
         }
     }
 
-    public void setDigests(Digests digests) {
-        this.digests = digests;
-    }
+//    public void setDigests(Digests digests) {  // probably not needed
+//        this.digests = digests;
+//    }
 
     public Boolean hasDigests(){
         return !(digests == null);
@@ -85,6 +85,10 @@ public class FileData {
 
     public Boolean hasProblems(){
         return error;
+    }
+
+    public Boolean noProblems(){
+        return !error;
     }
 
     @Override
