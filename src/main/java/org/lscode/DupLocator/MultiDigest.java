@@ -36,7 +36,7 @@ public class MultiDigest {
 
     public Digests calculate(FileData fdata) throws IOException {
         if (fdata.getSize() == 0){
-            return new Digests(algorithms, zeroDigest);
+            return new Digests(algorithms, zeroDigest); //????? maybe error flag in Digests?
         }
         return calculate(fdata.getFullPath());
     }
@@ -59,16 +59,13 @@ public class MultiDigest {
                 digests.put(entry.getKey(), bytesToHex(entry.getValue().digest()));
                 entry.getValue().reset();
             }
-
         }
         finally {
             for (Map.Entry<String, MessageDigest> entry : digestMachines.entrySet()) {
                 entry.getValue().reset();
             }
             buffer.clear();
-
         }
-
         return digests;
     }
 

@@ -11,19 +11,18 @@ import java.io.File;
 import java.io.IOException;
 
 public class FileData {
-
-    private String  name;
-    private String  path;
-    private long    size;
-    private long    mtime;
+    private String name;
+    private String path;
+    private long size;
+    private long mtime;
     private Digests digests;
     private Boolean error = false;
 
-    FileData(File aFile) {
-        this.name   = aFile.getName();
-        this.path   = aFile.getParent();
-        this.size   = aFile.length();
-        this.mtime  = aFile.lastModified();
+    FileData(final File file) {
+        this.name   = file.getName();
+        this.path   = file.getParent();
+        this.size   = file.length();
+        this.mtime  = file.lastModified();
     }
 
 
@@ -80,7 +79,7 @@ public class FileData {
 //    }
 
     public Boolean hasDigests(){
-        return !(digests == null);
+        return (digests != null);
     }
 
     public Boolean hasProblems(){
@@ -94,16 +93,14 @@ public class FileData {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-
-        builder.append(name);
-        builder.append("\n");
-        builder.append(path);
-        builder.append("\n");
-        builder.append(size);
-        builder.append("\n");
-        builder.append(mtime);
-        builder.append("\n");
-
-        return builder.toString();
+        return builder.append(name)
+                .append("\n")
+                .append(path)
+                .append("\n")
+                .append(size)
+                .append("\n")
+                .append(mtime)
+                .append("\n")
+                .toString();
     }
 }

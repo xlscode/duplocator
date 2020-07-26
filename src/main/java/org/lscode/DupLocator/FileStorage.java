@@ -31,7 +31,6 @@ public class FileStorage<T> implements Iterable<FileArray>{
 
     public void put(T criterion, FileData fileData){
         FileArray fileList;
-
         if (fileMap.containsKey(criterion)){
             fileList = fileMap.get(criterion);
         }
@@ -42,12 +41,12 @@ public class FileStorage<T> implements Iterable<FileArray>{
         fileList.add(fileData);
     }
 
-    public void putArray(T criterion, FileArray fArray){
+    public void putArray(T criterion, FileArray fileArray){
         if (fileMap.containsKey(criterion)){
-            fileMap.get(criterion).addAll(fArray);
+            fileMap.get(criterion).addAll(fileArray);
         }
         else{
-            fileMap.put(criterion, fArray);
+            fileMap.put(criterion, fileArray);
         }
     }
 
@@ -69,10 +68,10 @@ public class FileStorage<T> implements Iterable<FileArray>{
 
     public List<String> getDirs() {
         Set<String> uniqDirs = new HashSet<>();
-
-        for (FileArray fArray: this){
-            uniqDirs.addAll(fArray.getDirs());
+        for (FileArray fileArray: this){
+            uniqDirs.addAll(fileArray.getDirs());
         }
+//        Set<String> uniqDirs = fileMap.values().stream().flatMap(fa->getDirs().stream()).collect(Collectors.toSet());
         return new ArrayList<>(uniqDirs);
     }
 
@@ -91,11 +90,6 @@ public class FileStorage<T> implements Iterable<FileArray>{
     }
 
     public long filesTotal(){
-        long result = 0;
-
-        for (FileArray fArray: this){
-            result += fArray.size();
-        }
-        return result;
+        return fileMap.values().stream().mapToInt(fa->size()).sum();
     }
 }

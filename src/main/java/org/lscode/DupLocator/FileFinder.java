@@ -16,7 +16,6 @@ public class FileFinder extends Observable {
     private FileArray files = new FileArray();
     private File startDir;
     private List<String> failedDirs = new ArrayList<>();
-    private int filesProcessed = 0;
     private Boolean processing = false;
     private final int step = 50;
 
@@ -45,24 +44,23 @@ public class FileFinder extends Observable {
         // TODO: consider Files::newDirectoryStream - watch out for IOException
 
         String [] subNodes = nextDir.list();
-        if (subNodes == null){
-            failedDirs.add(nextDir.getAbsolutePath());
-        }
-        else {
-            for (String aPath : subNodes) {
-                java.io.File aNode = new File(nextDir, aPath);
-                if (aNode.isDirectory()) {
-                    find(aNode);
+        if (subNodes != null){
+            for (String path : subNodes) {
+                java.io.File newNode = new File(nextDir, path);
+                if (newNode.isDirectory()) {
+                    find(newNode);
                 }
-                if (aNode.isFile()) {
-                    files.add(new FileData(aNode));
-                    filesProcessed += 1;
-                    if (filesProcessed % step == 0){
+                if (newNode.isFile()) {
+                    files.add(new FileData(newNode));
+                    if (files.size() % step == 0){
                         setChanged();
                         notifyObservers();
                     }
                 }
             }
+        }
+        else{
+            failedDirs.add(nextDir.getAbsolutePath());
         }
     }
 
@@ -71,7 +69,7 @@ public class FileFinder extends Observable {
     }
 
     public int filesProcessed(){
-        return this.filesProcessed;
+        return this.files.size();
     }
 
     public Boolean processing(){

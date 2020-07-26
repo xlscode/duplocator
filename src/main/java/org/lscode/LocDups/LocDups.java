@@ -10,14 +10,13 @@ package org.lscode.LocDups;
 import org.lscode.DupLocator.DupLocator;
 import org.lscode.DupLocator.MultiDigest;
 
-import java.lang.reflect.Array;
 public class LocDups {
 
     private final static String[] HASH_LIST = {"MD5", "SHA-256"};
     private final static int BUFFER_SIZE = 1024 * 32;
 
     public static void main(String[] args){
-        if (Array.getLength(args) == 0){
+        if (args.length == 0){
             System.err.println("I need a parameter (start directory), please.");
             System.exit(1);
         }

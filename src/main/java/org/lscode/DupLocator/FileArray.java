@@ -30,9 +30,7 @@ public class FileArray implements Iterable<FileData>{
     }
 
     public void addAll(FileArray anotherFileArray){
-        for (FileData fileData : anotherFileArray){
-            fDataArray.add(fileData);
-        }
+        fDataArray.addAll(anotherFileArray.innerList());
     }
 
 //    public void addAll(List<FileData> fDataList){         // probably not needed
@@ -42,6 +40,10 @@ public class FileArray implements Iterable<FileData>{
 //    public boolean isEmpty(){          // probably not needed
 //        return fileArray.isEmpty();
 //    }
+
+    protected List<FileData> innerList(){
+        return fDataArray;
+    }
 
     public Iterator<FileData> iterator(){
         return fDataArray.iterator();
