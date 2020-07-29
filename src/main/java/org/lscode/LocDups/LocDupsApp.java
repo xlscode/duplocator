@@ -8,6 +8,7 @@
 package org.lscode.LocDups;
 
 
+import org.lscode.DupLocator.Digests;
 import org.lscode.DupLocator.DupLocator;
 import org.lscode.DupLocator.FileArray;
 import org.lscode.DupLocator.FileData;
@@ -32,7 +33,7 @@ public final class LocDupsApp implements Observer {
     }
 
     void run(){
-        FileStorage<String> dups = dupLocator.getDups();
+        FileStorage<Digests> dups = dupLocator.getDups();
         FileStorageMap<String, String> namesakes = dupLocator.getNamesakes();
         List<String> dupDirs;
         List<String> failedDirs;
@@ -67,7 +68,7 @@ public final class LocDupsApp implements Observer {
 
     }
 
-    private void printDups(FileStorage<String> dubs){
+    private void printDups(FileStorage<Digests> dubs){
         for (FileArray fileArray: dubs){
             for (FileData fd : fileArray){
                 System.out.println(fd.getFullPath());
