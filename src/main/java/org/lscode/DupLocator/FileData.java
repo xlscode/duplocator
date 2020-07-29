@@ -9,6 +9,7 @@ package org.lscode.DupLocator;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 public class FileData {
     private String name;
@@ -92,15 +93,20 @@ public class FileData {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        return builder.append(name)
-                .append("\n")
-                .append(path)
-                .append("\n")
-                .append(size)
-                .append("\n")
-                .append(mtime)
-                .append("\n")
-                .toString();
+        String lineSeparator = System.getProperty("line.separator");
+        return name + lineSeparator +
+                path + lineSeparator +
+                size + lineSeparator +
+                getMTimeString() + lineSeparator;
+    }
+
+    public String toStringWithDigests(){
+        return toString() + digests.toString();
+    }
+
+    private String getMTimeString(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(mtime);
     }
 }
+

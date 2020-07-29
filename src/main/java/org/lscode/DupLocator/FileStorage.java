@@ -29,14 +29,14 @@ public class FileStorage<T> implements Iterable<FileArray>{
         return fileMap.values().iterator();
     }
 
-    public void put(T criterion, FileData fileData){
+    public void put(T key, FileData fileData){
         FileArray fileList;
-        if (fileMap.containsKey(criterion)){
-            fileList = fileMap.get(criterion);
+        if (fileMap.containsKey(key)){
+            fileList = fileMap.get(key);
         }
         else{
             fileList = new FileArray();
-            fileMap.put(criterion, fileList);
+            fileMap.put(key, fileList);
         }
         fileList.add(fileData);
     }

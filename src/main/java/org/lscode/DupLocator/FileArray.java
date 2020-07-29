@@ -10,11 +10,8 @@ package org.lscode.DupLocator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-//import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-//import java.util.Set;
-//import java.util.HashSet;
 
 public class FileArray implements Iterable<FileData>{
     private List<FileData> fDataArray = new ArrayList<>();

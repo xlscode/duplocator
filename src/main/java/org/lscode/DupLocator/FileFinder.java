@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.Optional;
 
 public class FileFinder extends Observable {
     private FileArray files = new FileArray();
@@ -40,18 +41,16 @@ public class FileFinder extends Observable {
     }
 
     private void find(File nextDir){
-
-        // TODO: consider Files::newDirectoryStream - watch out for IOException
-
-        String [] subNodes = nextDir.list();
-        if (subNodes != null){
+        Optional<String[]> optSubNodes = Optional.ofNullable(nextDir.list());
+        if (optSubNodes.isPresent()){
+            String[] subNodes = optSubNodes.get();
             for (String path : subNodes) {
-                java.io.File newNode = new File(nextDir, path);
-                if (newNode.isDirectory()) {
-                    find(newNode);
+                java.io.File aNode = new File(nextDir, path);
+                if (aNode.isDirectory()) {
+                    find(aNode);
                 }
-                if (newNode.isFile()) {
-                    files.add(new FileData(newNode));
+                if (aNode.isFile()) {
+                    files.add(new FileData(aNode));
                     if (files.size() % step == 0){
                         setChanged();
                         notifyObservers();

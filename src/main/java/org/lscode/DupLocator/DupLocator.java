@@ -21,7 +21,7 @@ public class DupLocator extends Observable implements Observer {
     private MultiDigest digestGenerator;
     private String[] paths;
     private FileArray allFiles = new FileArray();
-    private FileStorage<String> dups;
+    private FileStorage<Digests> dups;
     private FileStorageMap<String, String> namesakes;
     private List<String> dirs;
     private List<String> failedDirs = new ArrayList<>();
@@ -54,7 +54,7 @@ public class DupLocator extends Observable implements Observer {
         setupDependencies();
     }
 
-    public FileStorage<String> getDups(){
+    public FileStorage<Digests> getDups(){
         executor.runProcessChain(Processes.FIND_DUPS);
         return dups;
     }
@@ -131,7 +131,7 @@ public class DupLocator extends Observable implements Observer {
     protected void findDups() {
         broadcastChange(Stage.DUPLICATES, Phase.START);
         int step = 50;
-        FileStorage<String> digested = new FileStorage<>();
+        FileStorage<Digests> digested = new FileStorage<>();
         FileStorage<Long> fAllSizes = allFiles.groupBySize();
         FileStorage<Long> fSameSize = fAllSizes.getRepeated();
         stateChange(Stage.DUPLICATES, Phase.INPROGRESS);
@@ -139,8 +139,8 @@ public class DupLocator extends Observable implements Observer {
             group.fillInDigests(digestGenerator);
             FileArray newGroup = group.errorless();
             for (FileData fData : newGroup){
-                String fdCombined = fData.getDigests().combined();
-                digested.put(fdCombined, fData);
+                Digests digests = fData.getDigests();
+                digested.put(digests, fData);
                 broadcastChangeIfStep(step);
             }
         }
